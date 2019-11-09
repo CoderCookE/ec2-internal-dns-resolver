@@ -32,8 +32,8 @@ func (c *connections) Delete(id uint16) {
 }
 
 func (c *connections) Get(id uint16) *net.UDPAddr {
-	c.Lock()
-	defer c.Unlock()
+	c.RLock()
+	defer c.RUnlock()
 
 	return c.Lookup[id]
 }
