@@ -43,30 +43,32 @@ func main() {
 				toCheck := []byte(question.Name.String())
 				matches := re.FindSubmatch(toCheck)
 
-				resolved := [4]byte{}
-				for i, v := range matches[1:] {
-					str := string(v)
-					val, _ := strconv.Atoi(str)
-					resolved[i] = uint8(val)
-				}
+				if len(matches) == 5 {
+					resolved := [4]byte{}
+					for i, v := range matches[1:] {
+						str := string(v)
+						val, _ := strconv.Atoi(str)
+						resolved[i] = uint8(val)
+					}
 
-				m.Header.Response = true
-				m.Header.Authoritative = true
-				newAnswers := []dnsmessage.Resource{
-					{
-						Header: dnsmessage.ResourceHeader{
-							Name:   dnsmessage.MustNewName(m.Questions[0].Name.String()),
-							Type:   dnsmessage.TypeA,
-							Class:  dnsmessage.ClassINET,
-							TTL:    278,
-							Length: 22,
+					m.Header.Response = true
+					m.Header.Authoritative = true
+					newAnswers := []dnsmessage.Resource{
+						{
+							Header: dnsmessage.ResourceHeader{
+								Name:   dnsmessage.MustNewName(m.Questions[0].Name.String()),
+								Type:   dnsmessage.TypeA,
+								Class:  dnsmessage.ClassINET,
+								TTL:    278,
+								Length: 22,
+							},
+
+							Body: &dnsmessage.AResource{A: resolved},
 						},
+					}
 
-						Body: &dnsmessage.AResource{A: resolved},
-					},
+					m.Answers = newAnswers
 				}
-
-				m.Answers = newAnswers
 			}
 
 			packed, err := m.Pack()
