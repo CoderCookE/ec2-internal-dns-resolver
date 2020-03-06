@@ -10,3 +10,6 @@ make`
 ### Running
 1) Set DNS to 127.0.0.1
 1) `./bin/ec2-internal-dns-resolver`
+
+### Running on Startup
+`cp ec2-internal-dns-resolver.plist ~/Library/LaunchAgents/`
