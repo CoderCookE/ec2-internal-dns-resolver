@@ -13,19 +13,16 @@
     <integer>20</integer>
 
     <key>StandardErrorPath</key>
-    <string>/Users/ecook/p/ec2-internal-dns-resolver/stderr.log</string>
+    <string>/Users/ecook/Library/Logs/ec2-internal-dns-resolver/stderr.log</string>
 
     <key>StandardOutPath</key>
-    <string>/Users/ecook/p/ec2-internal-dns-resolver/stdout.log</string>
+    <string>/Users/ecook/Library/Logs/ec2-internal-dns-resolver/stdout.log</string>
 
     <key>EnvironmentVariables</key>
     <dict>
       <key>PATH</key>
       <string><![CDATA[/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin]]></string>
     </dict>
-
-    <key>WorkingDirectory</key>
-    <string>/Users/ecook/p/ec2-internal-dns-resolver/</string>
 
     <key>ProgramArguments</key>
     <array>
