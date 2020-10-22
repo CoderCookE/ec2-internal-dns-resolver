@@ -91,7 +91,7 @@ func main() {
 				}
 			} else {
 				connec.Set(m.Header.ID, addr)
-				resolver := net.UDPAddr{IP: net.IP{1, 1, 1, 1}, Port: 53}
+				resolver := net.UDPAddr{IP: net.IP{8, 8, 8, 8}, Port: 53}
 				_, err = l.WriteToUDP(packed, &resolver)
 				if err != nil {
 					log.Printf("failed to resolve %s", err)
