@@ -7,10 +7,17 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/dgraph-io/ristretto"
 )
 
 func main() {
 	log.Print("Starting")
+	lookup, err := buildLookup()
+	if err != nil {
+		log.Fatal("listen error:", err)
+	}
+
 	origin := &net.UDPAddr{Port: 53}
 	l, err := net.ListenUDP("udp", origin)
 	if err != nil {
@@ -18,8 +25,7 @@ func main() {
 	}
 
 	defer l.Close()
-	// message := map[uint16]*net.UDPAddr{}
-	message := NewConnection()
+	connec := NewConnection(lookup)
 
 	for {
 		buf := make([]byte, 512)
@@ -28,7 +34,7 @@ func main() {
 			log.Fatal("accept error:", err)
 		}
 
-		go func(message *connections) {
+		go func() {
 			var m dnsmessage.Message
 			err = m.Unpack(buf)
 			if err != nil {
@@ -37,7 +43,7 @@ func main() {
 
 			question := m.Questions[0]
 			if strings.Contains(question.Name.String(), "ec2.internal") {
-				message.Set(m.Header.ID, addr)
+				connec.Set(m.Header.ID, addr)
 
 				re := regexp.MustCompile("(\\d{1,3})-(\\d{1,3})-(\\d{1,3})-(\\d{1,3})")
 				toCheck := []byte(question.Name.String())
@@ -76,7 +82,7 @@ func main() {
 				log.Printf("Packing err: %s", err)
 			}
 			if m.Header.Response {
-				_, err := l.WriteToUDP(packed, message.Get(m.Header.ID))
+				_, err := l.WriteToUDP(packed, connec.Get(m.Header.ID))
 				if err != nil {
 					log.Printf("Write err: %s", err)
 				}
@@ -84,15 +90,25 @@ func main() {
 					log.Printf("Questions: %v, type: %v, Answers: %v", m.Questions, m.Answers[0].Header.GoString(), m.Answers[0].Body.GoString())
 				}
 			} else {
-				message.Set(m.Header.ID, addr)
+				connec.Set(m.Header.ID, addr)
 				resolver := net.UDPAddr{IP: net.IP{1, 1, 1, 1}, Port: 53}
 				_, err = l.WriteToUDP(packed, &resolver)
 				if err != nil {
 					log.Printf("failed to resolve %s", err)
 				}
 			}
-		}(message)
+		}()
 	}
 
 	log.Println("exiting")
+}
+
+func buildLookup() (*ristretto.Cache, error) {
+	lookup, err := ristretto.NewCache(&ristretto.Config{
+		NumCounters: 1e7,     // number of keys to track frequency of (10M).
+		MaxCost:     1 << 30, // maximum cost of cache (1GB).
+		BufferItems: 64,      // number of keys per Get buffer.
+	})
+
+	return lookup, err
 }
