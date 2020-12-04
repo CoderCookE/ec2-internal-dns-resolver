@@ -4,7 +4,7 @@ Resolve ip-xx-xx-xx-xx.ec2.internal domains, proxy all other requests to 8.8.8.8
 
 ### Building
 ```
-make`
+make
 ```
 
 ### Running
