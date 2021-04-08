@@ -38,7 +38,8 @@ func main() {
 			var m dnsmessage.Message
 			err = m.Unpack(buf)
 			if err != nil {
-				log.Fatal("unpack err:", err)
+				log.Printf("unpack err:", err)
+				return
 			}
 
 			question := m.Questions[0]
