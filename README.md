@@ -1,10 +1,10 @@
 # ec2-internal-dns-resolver
 
-Resolve ip-xx-xx-xx-xx.ec2.internal domains, proxy all other requests to 1.1.1.1
+Resolve ip-xx-xx-xx-xx.ec2.internal domains, proxy all other requests to 8.8.8.8
 
 ### Building
 ```
-make`
+make
 ```
 
 ### Running
